@@ -1,11 +1,12 @@
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { UserService } from "./user.service";
+import { AuthService } from "./auth.service";
+
 
 const createUser = catchAsync(async (req, res) => {
     const payload = req.body
 
-    const result = await UserService.createUser(payload)
+    const result = await AuthService.createUser(payload)
 
     sendResponse(res, {
         statusCode: 201,
@@ -15,6 +16,6 @@ const createUser = catchAsync(async (req, res) => {
     });
 })
 
-export const UserControllers = {
+export const AuthController = {
     createUser,
 };

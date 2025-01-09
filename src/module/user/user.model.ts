@@ -1,8 +1,6 @@
+import { model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { model, Schema } from 'mongoose'
-import { IUser } from './user.interface'
-import config from '../../config';
-
+import { IUser } from './user.interface';
 const userSchema = new Schema<IUser>(
     {
         name: {
@@ -13,48 +11,40 @@ const userSchema = new Schema<IUser>(
             type: String,
             required: true,
             unique: true,
-            immutable: true,
         },
         password: {
             type: String,
             required: true,
-            select: false
+            select: false,
         },
         role: {
             type: String,
-            enum: ['user', 'admin'],
+            enum: ['admin', 'user'],
             default: 'user',
-            required: true
         },
         isBlocked: {
             type: Boolean,
             default: false,
-            required: true
-        }
-
-    }
-    ,
+        },
+    },
     {
         timestamps: true,
-    }
-)
+    },
+);
 
 userSchema.pre('save', async function (next) {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const user = this;
-    // hashing password and save into DB
-    user.password = await bcrypt.hash(
-        user.password,
-        Number(config.bcrypt_salt_rounds),
-    );
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-// set '' after saving password
-userSchema.post('save', function (doc, next) {
-    doc.password = '';
-    next();
-});
+userSchema.statics.isUserExist = async function (email: string) {
+    return await User.findOne({ email }).select('+password');
+};
+userSchema.statics.isPasswordMatched = async function (
+    password: string,
+    hashedpassword: string,
+) {
+    return await bcrypt.compare(password, hashedpassword);
+};
 
-const User = model<IUser>('User', userSchema)
-export default User
+export const User = model<IUser>('User', userSchema);

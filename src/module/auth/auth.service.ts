@@ -1,4 +1,4 @@
-import { User } from "./user.model";
+import { User } from "../user/user.model";
 
 export interface TRegistration {
     name: string;
@@ -12,6 +12,6 @@ const createUser = async (payload: TRegistration) => {
     return { _id, name, email };
 }
 
-export const UserService = {
+export const AuthService = {
     createUser,
 };

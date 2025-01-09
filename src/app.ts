@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import express, { NextFunction, Request, Response } from 'express'
-import { StatusCodes } from 'http-status-codes'
+import cors from 'cors';
+import express from 'express';
 
-const app = express()
+import { Routes } from './routes';
+import globalErrorHandler from './middlewares/globalErrorHandler';
+import notFound from './middlewares/notFound';
+const app = express();
 
-// middleware
-app.use(express.json())
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is running',
+  });
+});
+
+app.use(cors());
+app.use(express.json());
+
+app.use('/api', Routes);
+app.use(globalErrorHandler);
+app.use(notFound);
+export default app;
 
 
-app.get('/', (req: Request, res: Response) => {
-  res.send({
-    status: true,
-    message: 'Server Live',
-  })
-})
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
-  console.log('error from app.ts', err)
-  res
-    .status(StatusCodes.INTERNAL_SERVER_ERROR)
-    .json({ success: false, message: err.message, error: err })
-})
-
-export default app
