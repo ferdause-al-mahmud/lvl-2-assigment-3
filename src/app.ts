@@ -2,9 +2,9 @@
 import cors from 'cors';
 import express from 'express';
 
-import { Routes } from './routes';
-import globalErrorHandler from './middlewares/globalErrorHandler';
-import notFound from './middlewares/notFound';
+import { Routes } from './app/routes';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
 const app = express();
 
 app.get('/', (req, res) => {
