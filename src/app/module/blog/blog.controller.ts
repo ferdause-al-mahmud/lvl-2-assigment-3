@@ -1,6 +1,14 @@
+import { Types } from 'mongoose';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
+import { IUser } from '../user/user.interface';
+import { User } from '../user/user.model';
+import { TBlog } from './blog.interface';
 import { BlogServices } from './blog.service';
+
+interface ExistUser extends IUser {
+    _id?: Types.ObjectId;
+}
 
 const getAllBlog = catchAsync(async (req, res) => {
     const result = await BlogServices.getAllBlogsFromDB(req.query);
@@ -24,7 +32,13 @@ const getSingleBlog = catchAsync(async (req, res) => {
 
 const createBlog = catchAsync(async (req, res) => {
     const payload = req.body;
-    const result = await BlogServices.createBlogIntoDB(payload);
+    const { email } = req.user;
+    const existUser = await User.isUserExist(email);
+    const newBlog: TBlog = {
+        ...payload,
+        author: (existUser as ExistUser)?._id,
+    };
+    const result = await BlogServices.createBlogIntoDB(newBlog);
     sendResponse(res, {
         statusCode: 201,
         success: true,

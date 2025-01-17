@@ -7,4 +7,6 @@ const authRouter = Router()
 
 authRouter.post('/register', validateRequest(UserValidation.userValidationSchema), AuthController.createUser)
 
+authRouter.post('/login', AuthController.loginUser);
+
 export default authRouter
