@@ -36,7 +36,7 @@ const loginUserIntoDB = async (payload: TLogin) => {
     );
 
     if (!isPasswordMatched) {
-        throw new AppError(401, 'Incorrect Password');
+        throw new AppError(401, 'Invalid credentials');
     }
     const token = jwt.sign(
         {

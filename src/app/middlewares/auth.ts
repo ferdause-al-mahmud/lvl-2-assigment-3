@@ -6,11 +6,11 @@ import AppError from '../errors/AppError';
 import status from 'http-status';
 import { User } from '../module/user/user.model';
 import { TRole } from '../module/user/user.interface';
+import { Blog } from '../module/blog/blog.model';
 
 const auth = (...roles: TRole[]) => {
     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
         const token = req.headers.authorization;
-        console.log(req.headers.authorization)
         if (!token) {
             throw new AppError(status.UNAUTHORIZED, 'UnAuthorize access!!!');
         }
@@ -28,10 +28,30 @@ const auth = (...roles: TRole[]) => {
             throw new AppError(status.UNAUTHORIZED, 'This person is blocked');
         }
         req.user = bearer;
-        console.log({ user: req.user })
         next();
     });
 };
 
+const findAuthorId = async (email: string) => {
+    const result = await User.findOne({ email }).lean();
+    return result?._id;
+};
+
+export const updateOrDeleteAuth = () => {
+    return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+        const { email } = req.user;
+        const { id } = req.params;
+        const isBlogExist = await Blog.findById(id);
+        if (!isBlogExist) {
+            throw new AppError(404, 'Blog cannot be found');
+        }
+        const authorId = await findAuthorId(email);
+        const isAuthorUpdatingHisBlog = isBlogExist.author.equals(authorId);
+        if (!isAuthorUpdatingHisBlog) {
+            throw new AppError(404, 'You did not created this blog');
+        }
+        next();
+    });
+};
 
 export default auth;
