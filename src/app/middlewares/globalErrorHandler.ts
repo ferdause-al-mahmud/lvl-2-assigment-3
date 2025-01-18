@@ -7,7 +7,6 @@ import handleValidationError from '../errors/handleValidationError';
 import handleCastError from '../errors/handleCastError';
 import handleDuplicateError from '../errors/handleDuplicateError';
 import AppError from '../errors/AppError';
-import config from '../config';
 
 
 const globalErrorHandler = (
@@ -68,7 +67,7 @@ const globalErrorHandler = (
         message,
         statusCode: err?.statusCode || status,
         error: { details },
-        stack: (config.NODE_ENV as string) === 'development' ? err?.stack : null,
+        stack: err?.stack,
     });
 };
 
