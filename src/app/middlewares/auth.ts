@@ -10,7 +10,7 @@ import { Blog } from '../module/blog/blog.model';
 
 const auth = (...roles: TRole[]) => {
     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-        const token = req.headers.authorization;
+        const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
             throw new AppError(status.UNAUTHORIZED, 'UnAuthorize access!!!');
         }
